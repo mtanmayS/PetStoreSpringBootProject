@@ -2,6 +2,7 @@ package com.example.demo.service.impl;
 
 import com.example.demo.bean.request.PetRequest;
 import com.example.demo.exception.InvalidDataException;
+import com.example.demo.exception.InvalidInputException;
 import com.example.demo.exception.NoDataFoundException;
 import com.example.demo.model.*;
 import com.example.demo.repo.PetCategoryRepo;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -36,15 +38,25 @@ public class PetStoreServiceImpl implements PetStoreService {
             configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     @Override
     public Pet savePet(PetRequest petRequest) {
+        Category category;
+        if(petRequest.getName()!=null&& petRequest.getPhotoUrls()!=null){
+            if(petRequest.getCategory()!=null){
+                category=petRequest.getCategory();
+                petCategoryRepo.save(category);
+            }
+            List<Tag> tagList=new ArrayList<>();
+            if(petRequest.getTags()!=null){
+                tagList= petRequest.getTags();
+                tagList.forEach(tag->photoTagRepo.save(tag));
+            }
 
-        Category category=petRequest.getCategory();
-        petCategoryRepo.save(category);
-        List<Tag> tagList= petRequest.getTags();
-        for (Tag tag: tagList){
-            photoTagRepo.save(tag);
+            Pet pet=objectMapper.convertValue(petRequest,Pet.class);
+            return petStoreRepo.save(pet);
+        }else{
+            throw new InvalidDataException("Please check the " +
+                    "request body required field is not passed.");
         }
-        Pet pet=objectMapper.convertValue(petRequest,Pet.class);
-        return petStoreRepo.save(pet);
+
 
     }
 
@@ -124,49 +136,61 @@ public class PetStoreServiceImpl implements PetStoreService {
     }
 
     public Pet updatePetById(PetRequest petRequest){
+        if(petRequest.getName()!=null&& Objects.nonNull(petRequest.getPhotoUrls())){
+            Optional<Pet> optionalPet=petStoreRepo.findById(petRequest.getId());
+            Pet pet = new Pet();
+            if(optionalPet.isPresent()){
+                if(petRequest.getCategory()!=null){
+                    Category category=petRequest.getCategory();
+                    petCategoryRepo.save(category);
+                }
+                if(!petRequest.getTags().isEmpty()){
+                    List<Tag> tagList= petRequest.getTags();
+                    for (Tag tag: tagList){
+                        photoTagRepo.save(tag);
+                    }
+                }
 
-        Optional<Pet> optionalPet=petStoreRepo.findById(petRequest.getId());
-        Pet pet = new Pet();
-        if(optionalPet.isPresent()){
-        if(petRequest.getCategory()!=null){
-            Category category=petRequest.getCategory();
-            petCategoryRepo.save(category);
-        }
-        if(!petRequest.getTags().isEmpty()){
-            List<Tag> tagList= petRequest.getTags();
-            for (Tag tag: tagList){
-                photoTagRepo.save(tag);
+                pet= optionalPet.get();
+                CopyNonNullPropertiesUtil.copyNonNullProperties(petRequest,pet );
+
+
+                pet= petStoreRepo.save(pet);
+                return pet;
+            }else {
+                throw new NoDataFoundException("Pet Not found");
             }
+        }else{
+            throw new InvalidDataException("Please check the " +
+                    "request body required field is not passed.");
         }
 
-            pet= optionalPet.get();
-            CopyNonNullPropertiesUtil.copyNonNullProperties(petRequest,pet );
-
-
-            pet= petStoreRepo.save(pet);
-            return pet;
-        }else {
-            throw new NoDataFoundException("Pet Not found");
-        }
 
     }
 
     public Pet updatePet(int id,String name, String status){
 
-        Optional<Pet> optionalPet=petStoreRepo.findById((long) id);
-        Pet pet= new Pet();
-        if(optionalPet.isPresent()){
-            pet= optionalPet.get();
-            if(name!=null){
-                pet.setName(name);
+        if(Objects.nonNull(id)){
+            Optional<Pet> optionalPet=petStoreRepo.findById((long) id);
+            Pet pet= new Pet();
+            if(optionalPet.isPresent()){
+                pet= optionalPet.get();
+                if(name!=null){
+                    pet.setName(name);
+                }
+                if(status!=null){
+                    pet.setStatus(StatusEnum.valueOf(status));
+                }
+                return  petStoreRepo.save(pet);
+            }else{
+                throw  new NoDataFoundException("Pet not found");
             }
-            if(status!=null){
-                pet.setStatus(StatusEnum.valueOf(status));
-            }
-            return  petStoreRepo.save(pet);
         }else{
-            throw  new NoDataFoundException("Pet not found");
+            throw new InvalidDataException("Please check the " +
+                    "request body required field is not passed.");
+
         }
+
 
 
     }
