@@ -1,20 +1,20 @@
 package com.example.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-import net.bytebuddy.dynamic.loading.InjectionClassLoader;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
-import javax.persistence.*;
 
 @Data
-@Entity
-@Table(name="tag")
+@Table("tag")
 public class Tag {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name="tag_id")
+   @Column("tag_id")
     private long id;
 
-    @Column(name="tag_name")
+    @Column("tag_name")
     private String name;
 }

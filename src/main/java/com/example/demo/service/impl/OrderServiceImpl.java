@@ -111,7 +111,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     public Map<String, Integer> getInventory(){
-        List<Order> orders = orderRepo.findAll();
+        List<Order> orders = (List<Order>) orderRepo.findAll();
         return getInventoryStatus(orders);
 
     }

@@ -1,22 +1,20 @@
 package com.example.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
-import javax.persistence.*;
 
-@Getter
-@Setter
-@ToString
-@AllArgsConstructor
-@NoArgsConstructor
-@Entity
-@Table(name = "category")
+@Data
+@Table("category")
 public class Category {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name="category_id")
+    @Column("category_id")
     private long id;
-    @Column(name="category_name")
+    @Column("category_name")
     private String name;
 
 }
