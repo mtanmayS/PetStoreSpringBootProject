@@ -1,0 +1,273 @@
+{
+	"info": {
+		"_postman_id": "212fe110-7b55-4d59-9cab-e949f890e2a4",
+		"name": "PetStore",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "20406404"
+	},
+	"item": [
+		{
+			"name": "Order",
+			"item": [
+				{
+					"name": "Create Order",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{  \r\n  \"petId\": 14,\r\n  \"quantity\":19,\r\n  \"status\": \"approved\",\r\n  \"complete\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/store/order",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"store",
+								"order"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "fetch order",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/store/order/5",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"store",
+								"order",
+								"5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Order",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/store/order/5",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"store",
+								"order",
+								"5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get inventory",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/store/inventory",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"store",
+								"inventory"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "add pet",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"Tortoise\",\r\n  \"category\": {\r\n    \"id\": 1,\r\n    \"name\": \"Small Tortoise\"\r\n  },\r\n  \"photoUrls\": [\r\n    \"string\"\r\n  ],\r\n  \"tags\": [\r\n    {\r\n         \"id\": 1,\r\n            \"name\": \"tag4\"\r\n    },\r\n    {\r\n         \"id\": 2,\r\n        \"name\":\"tag2\"\r\n    }\r\n  ],\r\n  \"status\": \"available\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/pet",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"pet"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update by id",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"id\":14,\r\n  \"name\": \"doggie\",\r\n  \"category\": {\r\n    \"name\": \"PetDog\"\r\n  },\r\n  \"photoUrls\": [\r\n    \"string\",\r\n    \"strings\"\r\n  ],\r\n  \"tags\": [\r\n    {\r\n      \"id\":8,\r\n      \"name\": \"newTag\"\r\n    }\r\n  ],\r\n  \"status\": \"pending\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/pet",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"pet"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get By Id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/pet/14",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"pet",
+						"14"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete by id",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/pet/13",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"pet",
+						"13"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get by status",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/pet/findByStatus?status=availab",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"pet",
+						"findByStatus"
+					],
+					"query": [
+						{
+							"key": "status",
+							"value": "availab"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get by tags",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/pet/findByTags?tags=tag5",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"pet",
+						"findByTags"
+					],
+					"query": [
+						{
+							"key": "tags",
+							"value": "tag5"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update pet with status and name",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/pet/14?name=doggie&status=available",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"pet",
+						"14"
+					],
+					"query": [
+						{
+							"key": "name",
+							"value": "doggie"
+						},
+						{
+							"key": "status",
+							"value": "available"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
