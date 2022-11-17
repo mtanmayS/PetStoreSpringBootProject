@@ -12,11 +12,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
 
@@ -157,39 +161,79 @@ public class PetRepositoryImpl implements PetRepository{
     @Override
     public PetResponse getPetById(long id) {
 
-//        String sql="SELECT pet.pet_id,pet.pet_name,pet.pet_status,category.category_id," +
-//                "category.category_name,tag.tag_id,tag.tag_name,petphotourl.photo_url " +
-//                "From (((petInner Join category on pet.pet_id=category.pet_id) Inner join tag on pet.pet_id= tag.pet_id) " +
-//                "Inner join petphotourl on pet.pet_id= petphotourl.pet_id)";
+        String sql="SELECT pet.pet_id,pet.pet_name,pet.pet_status,category.category_id," +
+                "category.category_name,tag.tag_id,tag.tag_name,petphotourl.photo_url " +
+                "From (((pet Inner Join category on pet.pet_id=category.pet_id) Inner join tag on pet.pet_id= tag.pet_id) " +
+                "Inner join petphotourl on pet.pet_id= petphotourl.pet_id)" +
+                "where pet.pet_id=?";
 
 
-        Category category=jdbcTemplate.queryForObject("Select* from category where pet_id=?",
-                new Object[]{id},(rs, rowNum) ->
-                        new Category(rs.getLong("category_id"),
-                              rs.getLong("pet_id"),
-                                rs.getString("category_name")));
+        PetResponse petResponses = jdbcTemplate.query(sql,new Object[]{id},
+                rs -> {
+                    //List<PetResponse> list = new ArrayList<PetResponse>();
+                    PetResponse p =new PetResponse();
+                    PetCategory pc= new PetCategory();
+                    Set<Tags> tags= new LinkedHashSet<>();
+                    List<String> photos= new ArrayList<>();
+                    while(rs.next()){
+                        Tags tag= new Tags();
+                        String photo;
+                        p.setId(rs.getLong(1));
+                        p.setName(rs.getString(2));
+                        p.setStatus(StatusEnum.valueOf(rs.getString(3)));
+                        pc.setId(rs.getLong(4));
+                        pc.setName(rs.getString(5));
+                        p.setCategory(pc);
+                        tag.setId(rs.getLong(6));
+                        tag.setName(rs.getString(7));
+                        tags.add(tag);
+                        photo=rs.getString(8);
+                        photos.add(photo);
 
-        List<Tag> tag= jdbcTemplate.query("Select* from tag where pet_id=?",
-                new Object[]{id},(rs, rowNum) ->
-                        new Tag(rs.getLong("tag_id"),
-                                rs.getLong("pet_id"),
-                                rs.getString("tag_name")));
-        Set<Tag> tagSet= new LinkedHashSet<>();
-        tagSet.addAll(tag);
-        List<PetPhotoUrl> photoUrls= jdbcTemplate.query("Select* from petPhotoUrl where pet_id=?",
-                new Object[]{id},(rs, rowNum) ->
-                        new PetPhotoUrl(rs.getLong("photo_url_id"),
-                                rs.getLong("pet_id"),
-                                rs.getString("photo_url")));
+                    }
 
-        Pet pet= jdbcTemplate.queryForObject("Select* from pet where pet_id=?",
-                new Object[]{id},(rs, rowNum) ->
-                        new Pet(rs.getLong("pet_id"),
-                                rs.getString("pet_name"),
-                                rs.getString("pet_status")));
+                    p.setTags(tags);
+                    p.setPhotoUrls(photos);
+                    //list.add(p);
+                    return p;
+                });
 
 
-        return fetchPet( category,tagSet, photoUrls, pet);
+
+//        jdbcTemplate.queryForObject("Select* from category where pet_id=?",
+//                new Object[]{id},(rs, rowNum) ->
+//                        new Category(rs.getLong("category_id"),
+//                                rs.getLong("pet_id"),
+//                                rs.getString("category_name")));
+//
+//        Category category=jdbcTemplate.queryForObject("Select* from category where pet_id=?",
+//                new Object[]{id},(rs, rowNum) ->
+//                        new Category(rs.getLong("category_id"),
+//                              rs.getLong("pet_id"),
+//                                rs.getString("category_name")));
+//
+//        List<Tag> tag= jdbcTemplate.query("Select* from tag where pet_id=?",
+//                new Object[]{id},(rs, rowNum) ->
+//                        new Tag(rs.getLong("tag_id"),
+//                                rs.getLong("pet_id"),
+//                                rs.getString("tag_name")));
+//        Set<Tag> tagSet= new LinkedHashSet<>();
+//        tagSet.addAll(tag);
+//        List<PetPhotoUrl> photoUrls= jdbcTemplate.query("Select* from petPhotoUrl where pet_id=?",
+//                new Object[]{id},(rs, rowNum) ->
+//                        new PetPhotoUrl(rs.getLong("photo_url_id"),
+//                                rs.getLong("pet_id"),
+//                                rs.getString("photo_url")));
+//
+//        Pet pet= jdbcTemplate.queryForObject("Select* from pet where pet_id=?",
+//                new Object[]{id},(rs, rowNum) ->
+//                        new Pet(rs.getLong("pet_id"),
+//                                rs.getString("pet_name"),
+//                                rs.getString("pet_status")));
+
+
+        return petResponses;
+        //return fetchPet( category,tagSet, photoUrls, pet);
     }
 
     private PetResponse fetchPet(Category category,Set<Tag> tagSet,List<PetPhotoUrl> photoUrls, Pet pet){
